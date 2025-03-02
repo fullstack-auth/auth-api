@@ -2,13 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
-import { username, password } from './dto/login.dto';
 @Injectable()
 export class AuthService {
   private readonly users: CreateUserDto[] = [
     {
-      username: username,
-      password: password,
+      username: "John",
+      password: "open",
       mail: 'john@example.com',
       birthDate: "2024-12-05",
       gender: "male",

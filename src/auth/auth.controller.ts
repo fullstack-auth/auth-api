@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto'; 
@@ -14,7 +14,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   async login(@Body() body: LoginDto) {
     const user = await this.authService.validateUser(body.username, body.password);
-    if (!user) { return { message: 'Invalid credentials' } }
+    if (!user) {throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED)}
     return this.authService.login(user)
   }
 
@@ -32,6 +32,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Create a new user and return JWT token' })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() createUserDto: CreateUserDto) {
+    const existingUser = this.authService.getUsers().find(
+      (user) => user.username === createUserDto.username
+    );
+    if (existingUser) { throw new HttpException('Username already taken', HttpStatus.BAD_REQUEST)};
     return this.authService.createUser(createUserDto);
   }
 }
