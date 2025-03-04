@@ -45,7 +45,7 @@ export class AuthController {
     return { message: 'User deleted successfully' }
   };
 
-  @Put(':id')
+  @Put('users/:id')
   @ApiOperation({ summary: 'Update user by ID' })
   @ApiBody({ type: UpdateUserDto, description: 'User data to be updated' })
   async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
