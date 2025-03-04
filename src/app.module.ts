@@ -10,10 +10,10 @@ import * as jwt from 'jsonwebtoken';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'auth_users',
+      host: process.env.DATABASE_HOST,
       port: 3306,
-      username: 'admin',
-      password: 'admin',
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
       database: 'users',
       entities: [User],
       synchronize: true,

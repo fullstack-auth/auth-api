@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Body, HttpException, HttpStatus, Delete, Put, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { LoginDto } from '../dto/login.dto';
+import { LoginUserDto } from '../dto/login-user.dto';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 
@@ -19,8 +19,8 @@ export class AuthController {
 
   @Post('login') //Change endppoints
   @ApiOperation({ summary: 'Login and get JWT token' })
-  @ApiBody({ type: LoginDto })
-  async loginUser(@Body() body: LoginDto) {
+  @ApiBody({ type: LoginUserDto })
+  async loginUser(@Body() body: LoginUserDto) {
     const user = await this.authService.validateUser(body.username, body.password);
     if (!user) { throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED) } 
     return this.authService.loginUser(user);
@@ -32,8 +32,6 @@ export class AuthController {
 
   @Get('users/:id')
   @ApiOperation({ summary: 'Get user by ID' })
-  @ApiResponse({ status: 200, description: 'User found' })
-  @ApiResponse({ status: 404, description: 'User not found' })
   async getUserById(@Param('id') id: string) {
     const user = await this.authService.getUserById(id)
     if (!user) { throw new HttpException('User not found', HttpStatus.NOT_FOUND) }

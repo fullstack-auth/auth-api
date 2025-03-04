@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../user/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { LoginDto } from '../dto/login.dto';
+import { LoginUserDto } from '../dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from '../dto/update-user.dto'
 
@@ -40,7 +40,7 @@ export class AuthService {
   
   async getUsers() { return this.userRepository.find() }
 
-  async loginUser(user: LoginDto) {
+  async loginUser(user: LoginUserDto) {
     const dbUser = await this.userRepository.findOne({ where: { username: user.username } })
     if (!dbUser) { throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED) }
 
