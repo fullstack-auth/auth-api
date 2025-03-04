@@ -17,6 +17,8 @@ services:
       - .:/usr/src/app
     depends_on:
       - auth_users
+    networks:
+      - backend_network
 
   auth_users:
     container_name: auth_users
@@ -30,18 +32,27 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/my.cnf
+    networks:
+      - backend_network
 
   phpmyadmin:
     container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin:latest
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     environment:
       - PMA_HOST=auth_users
       - PMA_USER=root
       - PMA_PASSWORD=password
     depends_on:
       - auth_users
+    networks:
+      - backend_network
 
 volumes:
   mysql_data:
+
+networks:
+  backend_network:
+    driver: bridge
