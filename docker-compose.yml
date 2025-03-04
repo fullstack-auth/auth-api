@@ -6,7 +6,7 @@ services:
     build:
       context: .
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - DATABASE_HOST=auth_users
       - DATABASE_PORT=3306
