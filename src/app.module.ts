@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/user.entity';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
-import { JwtService } from '@nestjs/jwt';  // Import JwtService
+import { JwtService } from '@nestjs/jwt';
 import * as jwt from 'jsonwebtoken';
 
 @Module({
@@ -18,7 +18,7 @@ import * as jwt from 'jsonwebtoken';
       entities: [User],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([User]),  // Ensure User entity is registered
+    TypeOrmModule.forFeature([User]),
   ],
   controllers: [AuthController],
   providers: [
@@ -27,8 +27,8 @@ import * as jwt from 'jsonwebtoken';
       provide: JwtService,
       useFactory: () => {
         return new JwtService({
-          secret: 'your-secret-key', // You can also use environment variables here
-          signOptions: { expiresIn: '1h' },  // Set the expiration time
+          secret: 'your-secret-key',
+          signOptions: { expiresIn: '1h' },
         });
       },
     },
