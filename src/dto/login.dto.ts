@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export const username = "John";
-export const password = "open";
+export const username = "admin";
+export const password = "admin";
 
 export class LoginDto {
   @ApiProperty({

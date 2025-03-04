@@ -1,62 +1,62 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';  // JwtService import
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../user/user.entity';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { LoginDto } from '../dto/login.dto';
+import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class AuthService {
-  private readonly users: CreateUserDto[] = [
-    {
-      username: "John",
-      password: "open",
-      mail: 'john@example.com',
-      birthDate: "2024-12-05",
-      gender: "male",
-      phoneNumber: 0,
-      adress: "Baker-St. 18",
-      country: "Spain",
-    },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private jwtService: JwtService,  // Inject JwtService directly
+  ) {}
 
-  getUsers() {
-    return this.users;
+  // Get all users
+  async getUsers() {
+    return this.userRepository.find();
   }
 
-  constructor(private jwtService: JwtService) {}
+  // Validate the user's username and password
+  async validateUser(username: string, password: string): Promise<User | null> {
+    const user = await this.userRepository.findOne({ where: { username } });
+    if (user && (await bcrypt.compare(password, user.password))) {
+      return user;
+    }
+    return null;
+  }
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = this.users.find((user) => user.username === username)
-    if (user && user.password === password) { return user }
-    return null
-  };
-
+  // Login and generate JWT token
   async login(user: LoginDto) {
-    const payload = { username: user.username }
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' })
-    return { access_token: accessToken }
-  };
+    const dbUser = await this.userRepository.findOne({ where: { username: user.username } });
+    if (!dbUser) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
 
+    const payload = { username: dbUser.username, sub: dbUser.id };
+    // Manually signing the JWT token
+    return { access_token: this.jwtService.sign(payload, { expiresIn: '1h' }) };
+  }
+
+  // Create a new user, hash password, and generate JWT token
   async createUser(createUserDto: CreateUserDto): Promise<any> {
-    const existingUser = this.users.find((user) => user.username === createUserDto.username);
-    if (existingUser) { return { message: 'Username already taken' } }
+    const existingUser = await this.userRepository.findOne({ where: { username: createUserDto.username } });
+    if (existingUser) {
+      throw new HttpException('Username already taken', HttpStatus.BAD_REQUEST);
+    }
 
-    const newUser = {
-      username: createUserDto.username,
-      password: createUserDto.password,
-      mail: createUserDto.mail,
-      birthDate: createUserDto.birthDate,
-      gender: createUserDto.gender,
-      phoneNumber: createUserDto.phoneNumber,
-      adress: createUserDto.adress,
-      country: createUserDto.country
-    };
-    this.users.push(newUser);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const newUser = this.userRepository.create({ ...createUserDto, password: hashedPassword });
+    await this.userRepository.save(newUser);
 
-    const payload = { username: newUser.username };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
-
+    const payload = { username: newUser.username, sub: newUser.id };
+    // Manually signing the JWT token
     return {
       user: newUser,
-      access_token: accessToken,
+      access_token: this.jwtService.sign(payload, { expiresIn: '1h' }),
     };
   }
 }

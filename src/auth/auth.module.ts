@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { JwtModule } from '@nestjs/jwt'; // Import JwtModule
+import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from '../user/user.module';  // Import UserModule
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: 'your-secret-key', // Use a secret key for signing the JWT (you can store this in environment variables)
-      signOptions: { expiresIn: '1h' }, // Set expiration time for the JWT (e.g., 1 hour)
+      secret: 'your-secret-key',
+      signOptions: { expiresIn: '1h' },
     }),
+    UserModule,  // Include UserModule here
   ],
   providers: [AuthService],
   controllers: [AuthController],
