@@ -10,14 +10,14 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('register') //Change endppoints
+  @Post('register')
   @ApiOperation({ summary: 'Create a new user and return JWT token' })
   @ApiBody({ type: CreateUserDto })
   async createUser(@Body() createUserDto: CreateUserDto) {
     return this.authService.createUser(createUserDto);
   };
 
-  @Post('login') //Change endppoints
+  @Post('login')
   @ApiOperation({ summary: 'Login and get JWT token' })
   @ApiBody({ type: LoginUserDto })
   async loginUser(@Body() body: LoginUserDto) {
@@ -26,7 +26,7 @@ export class AuthController {
     return this.authService.loginUser(user);
   };
 
-  @Get('users') //Change endppoints
+  @Get('users')
   @ApiOperation({ summary: 'Get all users' })
   async getUsers() { return this.authService.getUsers() };
 
