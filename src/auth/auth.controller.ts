@@ -11,7 +11,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  @ApiOperation({ summary: 'Create a new user and return JWT token' })
+  @ApiOperation({ summary: 'Create user, return JWT token' })
   @ApiBody({ type: CreateUserDto })
   async createUser(@Body() createUserDto: CreateUserDto) {
     return this.authService.createUser(createUserDto);
