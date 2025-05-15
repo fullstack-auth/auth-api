@@ -4,7 +4,6 @@ import { User } from './user/user.entity';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
-import * as jwt from 'jsonwebtoken';
 
 @Module({
   imports: [

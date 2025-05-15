@@ -1,0 +1,33 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main  # Adjust if using a different branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H your-vps-ip >> ~/.ssh/known_hosts  # Dynamic key scan
+
+      - name: Deploy to VPS
+        run: |
+          ssh ubuntu@51.222.111.230 << 'EOF'
+          cd /devstore/auth-api
+          git pull origin main
+          
+          docker compose down 
+          
+          # Start using the npm script
+          npm run start:docker
+          EOF
